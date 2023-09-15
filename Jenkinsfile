@@ -1,6 +1,6 @@
 pipeline {
     agent {
-        label 'pipe-jenkins-agent-1'
+        label 'agent-1'
     }
 
     environment {
