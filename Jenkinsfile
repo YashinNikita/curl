@@ -12,14 +12,6 @@ pipeline {
             }
         }
 
-        stage('Install Dependencies') {
-            steps {
-                sh '''
-                    brew install automake libtool openssl
-                '''
-            }
-        }
-
         stage('Configure and Build') {
             steps {
                 sh '''
@@ -40,3 +32,4 @@ pipeline {
 
     }
 }
+
