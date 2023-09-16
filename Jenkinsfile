@@ -3,8 +3,6 @@ pipeline {
 
     environment {
         REPO_URL = 'https://github.com/YashinNikita/curl.git'
-        ARTIFACTORY_URL = 'http://artifactory:8081/artifactory'
-        ARTIFACTORY_REPO = 'todo-in-ui'
     }
 
     stages {
@@ -14,53 +12,31 @@ pipeline {
             }
         }
 
-        stage('Configure') {
+        stage('Install Dependencies') {
             steps {
-                script {
-                    sh './configure --with-openssl'  // add additional flags as needed
-                }
+                sh '''
+                    brew install automake libtool openssl
+                '''
             }
         }
 
-        stage('Build') {
+        stage('Configure and Build') {
             steps {
-                script {
-                    sh 'make'
-                }
+                sh '''
+                    ./buildconf
+                    ./configure --with-ssl=/usr/local/opt/openssl
+                    make
+                '''
             }
         }
 
-        stage('Run Unit Tests') {
+        stage('Run Tests') {
             steps {
-                script {
-                    sh 'make test'
-                }
+                sh '''
+                    make test
+                '''
             }
         }
 
-        stage('Prepare Build Artifact') {
-            steps {
-                script {
-                    sh 'tar czvf curl-build-artifact.tar.gz build/'  // Assuming build outputs are in the build folder
-                }
-            }
-        }
-
-        stage('Push to Artifactory') {
-            steps {
-                script {
-                    def server = Artifactory.newServer url: ARTIFACTORY_URL, credentialsId: 'Your-Credentials-ID'  // Replace with your actual credentials ID
-                    def uploadSpec = """{
-                        "files": [
-                            {
-                                "pattern": "curl-build-artifact.tar.gz",
-                                "target": "${ARTIFACTORY_REPO}/"
-                            }
-                        ]
-                    }"""
-                    server.upload(uploadSpec)
-                }
-            }
-        }
     }
 }
