@@ -14,6 +14,14 @@ pipeline {
             }
         }
 
+        stage('Configure') {
+            steps {
+                script {
+                    sh './configure --with-openssl'  // add additional flags as needed
+                }
+            }
+        }
+
         stage('Build') {
             steps {
                 script {
@@ -53,6 +61,12 @@ pipeline {
                     server.upload(uploadSpec)
                 }
             }
+        }
+    }
+
+    post {
+        always {
+            // todo
         }
     }
 }
